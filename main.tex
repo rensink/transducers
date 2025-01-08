@@ -1,0 +1,21 @@
+\documentclass{llncs}
+\usepackage{preamble}
+\begin{document}
+We presuppose a universe $\Lab$ of \emph{labels}, with a special element $\tau$.
+
+\begin{definition}[transduction system]
+A \emph{transduction system} (or \emph{transducer}) is a tuple $S=\tupof{Q,Q^\Stdy,\qinit,T}$ where
+\begin{itemize}[topsep=\itemsep]
+\item $Q$ is a set of states;
+\item $Q^\Stdy\subseteq Q$ is a set of \emph{steady} states;
+\item $\qinit\in Q^\Stdy$ is the initial state;
+\item $T\subseteq Q\times \Lab\times \Lab\times Q$ is a transition relation, such that $(q,a,b,q'),(q',c,d,q'')\in T$ with $q\notin Q^\Stdy$ implies $a=b$.
+\end{itemize}
+A transduction system is a \emph{transition system} if $Q^\Stdy=Q$ and $(q,a,b,q')\in T$ implies $b=\tau$.
+\end{definition}
+%
+A state that is not steady is called \emph{transient}; we use $Q^\Trnt=Q\setminus Q^\Stdy$ to denote the set of transient states. We also use $q\tduce a b q'$ to denote $(q,a,b,q')\in T$, and if $S$ is a transition system, we typically leave out the second (lower) label altogether.
+
+
+
+\end{document}
