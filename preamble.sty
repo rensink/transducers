@@ -20,18 +20,24 @@
 \algrenewcommand{\algorithmicthen}{{\bfseries\sffamily then}}
 \algrenewcommand{\algorithmicdo}{{\bfseries\sffamily do}}
 \usepackage{multicol}
-
-\newcommand{\GROOVE}{GROOVE}
+\usepackage{bussproofs}
 
 \newcommand{\dom}{\mathop{\mathrm{dom}}}
 \newcommand{\True}{\mathbf{true}}
 \newcommand{\False}{\mathbf{false}}
 
 \newcommand{\Trnt}{\mathsf{T}}
+\newcommand{\trnt}{{\circ}}
 \newcommand{\Stdy}{\mathsf{S}}
+\newcommand{\stdy}{{\bullet}}
+\newcommand{\Final}{\mathsf{F}}
+\newcommand{\final}{{\uparrow}}
 
 \newcommand{\qinit}{\iota}
 \newcommand{\Lab}{\Lambda}
+\newcommand{\emptystr}{\epsilon}
+
+\newcommand{\on}{\mathbin{{:}{:}}}
 
 % Inner and outer
 \newcommand{\kInner}{innr}
@@ -146,17 +152,38 @@
 		{\raisebox{2pt}{$\scriptstyle#1$}}
 		{\raisebox{2pt}{$\scriptscriptstyle#1$}}
 }}
+% Typeset the lower label of an extensible arrow by raising the text even further
+\newcommand{\raiselabelxx}[1]{\smash{\mathchoice
+		{\raisebox{4.5pt}{$\scriptstyle#1$}}
+		{\raisebox{4.5pt}{$\scriptstyle#1$}}
+		{\raisebox{3pt}{$\scriptstyle#1$}}
+		{\raisebox{3pt}{$\scriptscriptstyle#1$}}
+}}
 
 % Prepend a negation to an extensible arrow
 \newcommand{\xarrownot}{\mathrel{\arrownot-}\mkern-7mu}
 
 % single-arrow transduction
-\newcommand{\tduce}[3][\,]{\mapstochar\xrightarrow[\raiselabelx{#3}]{\lowerlabel{#2}}_{\!#1}}
+\newcommand{\tduce}[3][\,]{\mathrel{
+  \smash{\xrightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
+  \vphantom{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
+}}
+
+% double-arrow transduction
+\newcommand{\Tduce}[3][\,]{\mathrel{
+  \smash{\xRightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
+  \vphantom{\xrightarrow{\lowerlabel{#2}}}
+}}
 
 % single-arrow transition
 \newcommand{\trans}[2][\,]{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
 % negative single-arrow transition
 \newcommand{\ntrans}[2][\,]{\mathrel{\xarrownot\trans{#2}}_{\!#1}}
+
+% doublie-arrow transition
+\newcommand{\Trans}[2][\,]{\xRightarrow{\lowerlabel{#2}}_{\!#1}}
+% negative single-arrow transition
+\newcommand{\nTrans}[2][\,]{\mathrel{\xarrownot\Trans{#2}}_{\!#1}}
 
 % mapsto-like transition
 \newcommand{\step}[2][\,]{\mapstochar\xrightarrow{\lowerlabel{#2}}_{\!#1}}
