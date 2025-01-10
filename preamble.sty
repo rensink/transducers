@@ -38,7 +38,8 @@
 \newcommand{\emptystr}{\epsilon}
 
 \newcommand{\on}{\mathbin{{:}{:}}}
-
+\newcommand{\close}[1]{\bar{#1}}
+\newcommand{\closex}[1]{\overline{#1}}
 % Inner and outer
 \newcommand{\kInner}{innr}
 \newcommand{\Inner}[1][\,]{\ensuremath{\mathit{\kInner}_{\!#1}}\xspace}
@@ -104,10 +105,9 @@
 \newcommand{\Partial}[1][]{\ensuremath{\mathit{part}}_{\!#1}\xspace}
 \newcommand{\Atomic}[1][]{\ensuremath{\mathit{atom}}_{\!#1}\xspace}
 
-\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cI}{\mathcal{I}}
 \newcommand{\cP}{\mathcal{P}}
-\newcommand{\cB}{\mathcal{B}}
-\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cR}{\mathcal{R}}
 \newcommand{\cS}{\mathcal{S}}
 
 \newcommand{\natN}{\mathbb{N}}
@@ -116,6 +116,7 @@
 \newcommand{\setof}[1]{\{{#1}\}}
 \newcommand{\gensetof}[2]{\setof{{#1}\mid{#2}}}
 \newcommand{\tupof}[1]{\langle{#1}\rangle}
+\newcommand{\powersetof}[1]{\cP({#1})}
 \newcommand{\iffdef}{:\Leftrightarrow}
 % Partial function
 \newcommand{\pto}{\hookrightarrow}
