@@ -8,6 +8,7 @@
 \setlist{itemsep=0pt}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{cleveref}
 \usepackage{ulem}
 \renewcommand{\ULdepth}{.7pt}
 \normalem
@@ -27,19 +28,35 @@
 \newcommand{\False}{\mathbf{false}}
 
 \newcommand{\Trnt}{\mathsf{T}}
-\newcommand{\trnt}{{\circ}}
+\newcommand{\trnt}[1][]{{\circ^{#1}}}
 \newcommand{\Stdy}{\mathsf{S}}
-\newcommand{\stdy}{{\bullet}}
+\newcommand{\stdy}[1][]{{\bullet^{#1}}}
 \newcommand{\Final}{\mathsf{F}}
 \newcommand{\final}{{\uparrow}}
+\newcommand{\full}[1][]{{\color{grey}\circ^{#1}}}
 
 \newcommand{\qinit}{\iota}
 \newcommand{\Lab}{\Lambda}
 \newcommand{\emptystr}{\epsilon}
 
+\newcommand{\try}{\mathbin{?}}
+\newcommand{\alap}{\mathop{!}}
 \newcommand{\on}{\mathbin{{:}{:}}}
+\newcommand{\invokes}{\mathrel{\mathit{tries}}}
+\newcommand{\enables}{\mathrel{\mathit{can}}}
+\newcommand{\ifnot}{{\hat{\;}}}
+\newcommand{\term}{\varepsilon}
 \newcommand{\close}[1]{\bar{#1}}
 \newcommand{\closex}[1]{\overline{#1}}
+
+\newcommand{\LTduce}{\mathbf{LT}}
+\newcommand{\STduce}{\mathbf{ST}}
+\newcommand{\any}{\_}
+\newcommand{\Traces}{\mathit{traces}}
+
+\newcommand{\ruleis}{\;::=\;}
+\newcommand{\rulemid}{\:\mid\:}
+
 % Inner and outer
 \newcommand{\kInner}{innr}
 \newcommand{\Inner}[1][\,]{\ensuremath{\mathit{\kInner}_{\!#1}}\xspace}
@@ -50,15 +67,6 @@
 
 \newcommand{\Init}[1][\,]{\ensuremath{\iota}_{\!#1}\xspace}
 \newcommand{\pInit}{\mbox{\uline{$\iota$}}\xspace}
-
-\newcommand{\pPrime}{\mbox{\textit{\uline{prim}}}\xspace}
-
-\newcommand{\kFull}{full}
-\newcommand{\Full}[1][\mkern2mu]{\ensuremath{\mathit{\kFull}}_{\mkern-2mu#1}\xspace}
-\newcommand{\pFull}{\mbox{\uline{\textit{\kFull}}}\xspace}
-\newcommand{\kShort}{shrt}
-\newcommand{\Short}[1][]{\ensuremath{\mathit{\kShort}}_{\mkern-2mu#1}\xspace}
-\newcommand{\pShort}{\mbox{\uline{\textit{\kShort}}}\xspace}
 
 % Open and closed
 \newcommand{\Open}[1][\,]{\ensuremath{\mathit{open}}_{\!#1}\xspace}
@@ -104,6 +112,10 @@
 % Partiality of a transition
 \newcommand{\Partial}[1][]{\ensuremath{\mathit{part}}_{\!#1}\xspace}
 \newcommand{\Atomic}[1][]{\ensuremath{\mathit{atom}}_{\!#1}\xspace}
+
+\newcommand{\rC}{\mathsf{C}}
+\newcommand{\rF}{\mathsf{F}}
+\newcommand{\rR}{\mathsf{R}}
 
 \newcommand{\cI}{\mathcal{I}}
 \newcommand{\cP}{\mathcal{P}}
@@ -165,40 +177,54 @@
 \newcommand{\xarrownot}{\mathrel{\arrownot-}\mkern-7mu}
 
 % single-arrow transduction
-\newcommand{\tduce}[3][\,]{\mathrel{
-  \smash{\xrightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
-  \vphantom{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
-}}
+%\newcommand{\tduce}[3][\,]{\mathrel{
+%  \smash{\xrightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
+%  \vphantom{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
+%}}
+\newcommand{\tduce}[3][\,]{\trans[#1]{{#2}{\on}{#3}}}
 
 % double-arrow transduction
-\newcommand{\Tduce}[3][\,]{\mathrel{
-  \smash{\xRightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
-  \vphantom{\xrightarrow{\lowerlabel{#2}}}
-}}
+%\newcommand{\Tduce}[3][\,]{\mathrel{
+%  \smash{\xRightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
+%  \vphantom{\xrightarrow{\lowerlabel{#2}}}
+%}}
+\newcommand{\Tduce}[2]{\Trans{{#1}{\on}{#2}}}
 
 % single-arrow transition
-\newcommand{\trans}[2][\,]{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
+\newcommand{\trans}[2][\,]{\mathchoice
+  {\inlinetrans[#1]{#2}}
+  {\inlinetrans[#1]{#2}}
+  {\inlinetrans[#1]{#2}}
+  {\inlinetrans[#1]{#2}}
+}
+\newcommand{\inlinetrans}[2][\,]{\mathrel{
+  \smash{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
+  \vphantom{\xrightarrow{\lowerlabel{#2}}}
+}}
+\newcommand{\displaytrans}[2][\,]{\mathrel{
+  \smash{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
+  \vphantom{\xrightarrow{X}}
+}}
 % negative single-arrow transition
 \newcommand{\ntrans}[2][\,]{\mathrel{\xarrownot\trans{#2}}_{\!#1}}
 
 % doublie-arrow transition
-\newcommand{\Trans}[2][\,]{\xRightarrow{\lowerlabel{#2}}_{\!#1}}
+\newcommand{\Trans}[2][\,]{\mathchoice
+  {\displayTrans[#1]{#2}}
+  {\displayTrans[#1]{#2}}
+  {\inlineTrans[#1]{#2}}
+  {\inlineTrans[#1]{#2}}
+}
+\newcommand{\inlineTrans}[2][\,]{\mathrel{
+  \smash{\xRightarrow{\smash{\lowerlabel{#2}}}_{\!#1}}
+  \vphantom{\xrightarrow{\smash{\lowerlabel{#2}}}}
+}}
+\newcommand{\displayTrans}[2][\,]{\mathrel{
+  \smash{\xRightarrow{#2}_{\!#1}}
+  \vphantom{\xrightarrow{#2}}
+}}
 % negative single-arrow transition
 \newcommand{\nTrans}[2][\,]{\mathrel{\xarrownot\Trans{#2}}_{\!#1}}
-
-% mapsto-like transition
-\newcommand{\step}[2][\,]{\mapstochar\xrightarrow{\lowerlabel{#2}}_{\!#1}}
-% negated mapsto-like transition
-\newcommand{\nstep}[2][\,]{\mapstochar\joinrel\xarrownot\xrightarrow{\lowerlabel{#2}}_{\!#1}}
-% step with unspecified label
-\newcommand{\stepany}[1][\,]{\mapsto_{\!#1}}
-% negated step with unspecified label
-\newcommand{\nstepany}[1][\,]{\mathrel{\!\arrownot\,\mapsto_{\!#1}}}
-
-% Transactional transition
-\newcommand{\tstep}[2][\,]{\mapstochar\xrightarrow{\lowerlabel{#2}}\mathrel{\mkern-13mu}\rightarrow_{\!#1}}
-% Negated transactional transition
-%\newcommand{\nttrans}{\arrownot\tstep}
 
 %%%% Recapture the mapstochar, which is set to undefined by MnSymbol
 \usepackage{trimclip}

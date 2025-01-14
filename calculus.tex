@@ -1,0 +1,241 @@
+\section{A calculus for control}
+\label{sec:calculus}
+
+The nonterminal $\rC$ stands for arbitrary control programs, which will turn out to give rise to proper transducers (i.e., that do not have $\emptystr$ as concrete transition). The nonterminal $\rR$ generates the fragment of non-empty, finite programs. Finally, $\rF$ stands for a refinement function.
+%
+\begin{align*}
+\rC & \ruleis a \rulemid \term \rulemid \rC_1;\rC_2 \rulemid \rC_1+\rC_2 \rulemid \rC_1\try \rC_2 \rulemid \alap \rC \rulemid \rC[\rF] \rulemid a@\rC \\
+\rR & \ruleis a \rulemid \rR_1;\rC_2 \rulemid \rR_1+\rR_2 \rulemid \rR_1\try \rR_2 \rulemid \rR[\rF] \\
+\rF & \ruleis a_1 \mapsto \rR_1, \cdots, a_n\mapsto \rR_n \enspace.
+\end{align*}
+%
+Non-standard operators are:
+\begin{itemize}
+\item \emph{Priority choice} $\rC_1\try \rC_2$. Tries to execute $\rC_1$; if this fails, tries to execute $\rC_2$.
+\item \emph{As-long-as-possible} $\alap \rC$. Can be thought of as equivalent to $\rC;\alap \rC\try \term$.
+\item \emph{Refinement} $\rC[\rF]$. When $\rC$ invokes action $a$, $\rC[\rF]$ atomically executes $\rF(a)$.
+\item \emph{Intermediate state $a@\rC$}. Reached during the atomic execution of a refined $a$.
+\end{itemize}
+%
+We will explain the purpose and functioning of control programs by first restricting to the fragment without refinement. For the semantics, we adapt the approach of \cite{CCS-Priority-Choice} to the setting of this paper. (See \Cref{sec:related} for a brief discussion of the adaptations.)
+
+A control program $\rC$ is \emph{imposed} on an existing \emph{target system} $\cS$, the behaviour of which is given by a labelled transition system (LTS); the composed system is denoted $\rC\on\cS$. In the composed system, $\rC$ \emph{invokes} actions of the target system in a given order and $\cS$ \emph{executes} them; however, not all actions that $\rC$ tries to invoke are always enabled in the LTS, if not, the invocation attempt fails. These roles (invocation and execution) roughly correspond to \emph{output} (by the control program) versus \emph{input} (of the LTS), as used in CCS \cite{CCS}.
+
+In a control program of the form $\rC_1\try \rC_2$, the operand $\rC_2$ is ``activated'' if and only if none of the actions initially invoked by $\rC_1$ are enabled in the target system; the control program $\alap \rC_1$ terminates in that case. Hence action invocation by, as well as termination of, a control program is in general \emph{conditional} on the failure of other, previously attempted actions. This effect is captured by the following predicates:
+%
+\begin{itemize}
+\item $\rC \invokes X$ for some set of actions $X$, denoting that the control program $\rC$ can only progress by invoking one of the actions in $X$ (and in particular, cannot immediately terminate);
+\item $\cS \enables X$ for some set of actions $X$, denoting that at least one of the actions in $X$ is enabled in the target system $\cS$;
+\item $\rC\trans{a\ifnot X} \rC'$ (read: ``$a$ unless $X$''), denoting that the control program $\rC$ invokes $a$, evolving into $\rC'$, \emph{unless} one of the (previously tried) actions in $X$ was enabled.
+\end{itemize}
+%
+Each of these predicates can be defined using SOS-type rules. Two crucial rules are:
+%
+\begin{center}
+\AxiomC{$\rC_1\invokes X$}
+\AxiomC{$\rC_2\trans{a\ifnot Y} \rC'$}
+\BinaryInfC{$\rC_1\try \rC_2\displaytrans{a\ifnot(X\cup Y)} \rC'$}
+\DisplayProof
+%
+\quad
+%
+\AxiomC{$\rC\trans{a\ifnot X} \rC'$}
+\AxiomC{$\neg (\cS\enables X)$}
+\AxiomC{$\cS\trans a \cS'$}
+\TrinaryInfC{$\rC\on \cS \displaytrans a \rC'\on \cS'$}
+\DisplayProof
+\end{center}
+
+
+
+
+
+Terms and refinement functions are \emph{typed}: $\rC:A,C$ (respectively $\rF:A,C$) denotes that $\rC$ (respectively $\rF$) has abstract alphabet $A$ and concrete alphabet $C$. We give the typing rules for $\rC$ and $\rF$; those for $\rR$ coincide with the ones for $\rC$.
+%
+\begin{center}
+\AxiomC{$a\in A\cap C\vphantom{\rC_1}$}
+\UnaryInfC{$a:A,C$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\vphantom{\rC_1}$}
+\UnaryInfC{$\term:A,C$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC_1:A,C$}
+\AxiomC{$\rC_2:A,C$}
+\BinaryInfC{$\begin{array}[t]{c}
+\rC_1;\rC_2:A,C \\
+\rC_1+\rC_2:A,C \\
+\rC_1\try\rC_2:A,C \\
+\alap\rC_1:A,C
+\end{array}$}
+\DisplayProof
+%
+\\[\medskipamount]
+%
+\AxiomC{$\rC:A,B$}
+\AxiomC{$\rF:B,C$}
+\BinaryInfC{$\rC[\rF]:A,C$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$a\in A$}
+\AxiomC{$\rC:A,C$}
+\BinaryInfC{$a@\rC:A,C$}
+\DisplayProof
+%
+\\[\medskipamount]
+%
+\AxiomC{$a_1,\ldots,a_n\in A$}
+\AxiomC{$A\setminus\setof{a_1,\ldots,a_n}\subseteq C$}
+\AxiomC{$\rR_1:B_1,C \quad\cdots\quad \rR_n:B_n,C$}
+\TrinaryInfC{$\rF:A,C$}
+\DisplayProof
+\end{center}
+%
+Note that the type of a term is not unique. Below, we use $\rF:A,C$ as a function from $A$ to terms $\rF(a):\any,C$, mapping actions not explicitly listed to themselves. If $\rF\equiv a_1 \mapsto \rR_1, \cdots, a_n\mapsto \rR_n$, then for arbitrary $a\in A$ this function is defined by
+%
+\[ \rF:a\mapsto \begin{cases}
+                \rR_i & \text{if $a=a_i$} \\
+                a & \text{otherwise.}
+                \end{cases} \]
+%
+The small-step semantics of our calculus is determined by operational rules. Transitions are generated by the following rules:
+%
+\begin{center}
+\AxiomC{$\vphantom\final$}
+\UnaryInfC{$a \tduce a a \term\vphantom\final$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC_1\tduce a c \rC'$}
+\UnaryInfC{$\rC_1;\rC_2\tduce a c \rC';\rC_2$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC_1\final$}
+\AxiomC{$\rC_2\tduce a c \rC'$}
+\BinaryInfC{$\rC_1;\rC_2\tduce a c\rC'$}
+\DisplayProof
+%
+\\[\medskipamount]
+%
+\AxiomC{$\rC_1\tduce a c \rC'$}
+\UnaryInfC{$\rC_1+\rC_2\tduce a c \rC'$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC_2\tduce a c \rC'$}
+\UnaryInfC{$\rC_1+\rC_2\tduce a c \rC'$}
+\DisplayProof
+%
+\\[\medskipamount]
+%
+\AxiomC{$\rC\tduce a c \rC'$}
+\AxiomC{$\rF(c)\tduce b e \rC''$}
+\BinaryInfC{$\rC[\rF]\tduce a e a@\rC'';\rC'[\rF]$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC\tduce b c \rC'$}
+\UnaryInfC{$a@\rC\tduce a c a@\rC'$}
+\DisplayProof
+\end{center}
+%
+Termination is generated by the following rules:
+%
+\begin{center}
+\AxiomC{$\vphantom\final$}
+\UnaryInfC{$\term\final$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC_1\final$}
+\AxiomC{$\rC_2\final$}
+\BinaryInfC{$\rC_1;\rC_2\;\final$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC_1\final$}
+\UnaryInfC{$\rC_1+\rC_2\;\final$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC_2\final$}
+\UnaryInfC{$\rC_1+\rC_2\;\final$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC\final$}
+\UnaryInfC{$\rC[\rF]\final$}
+\DisplayProof
+%
+\;
+%
+\AxiomC{$\rC\final$}
+\UnaryInfC{$a@\rC\final$}
+\DisplayProof
+\end{center}
+%
+The rules for the transience level are:
+%
+\begin{center}
+\def\defaultHypSeparation{\hskip .0in}
+\AxiomC{$\vphantom\final$}
+\UnaryInfC{$a\trnt[0]\vphantom\rC$}
+\DisplayProof
+%
+\,
+%
+\AxiomC{$\vphantom\final\vphantom\final$}
+\UnaryInfC{$\term\trnt[0]\vphantom\rC$}
+\DisplayProof
+%
+\,
+%
+\AxiomC{$\rC_1\trnt[i]\vphantom\final$}
+\AxiomC{$\rC_2\trnt[j]$}
+\BinaryInfC{$\rC_1;\rC_2\;\trnt[i]$}
+\DisplayProof
+%
+\,
+%
+\AxiomC{$\rC_1\trnt[i]\vphantom\final$}
+\AxiomC{$\rC_2\trnt[j]$}
+\BinaryInfC{$\rC_1+\rC_2\;\trnt[0]$}
+\DisplayProof
+%
+\,
+%
+\AxiomC{$\rC\trnt[i]\vphantom\final$}
+\UnaryInfC{$\rC[\rF]\trnt[i]$}
+\DisplayProof
+%
+\,
+%
+\AxiomC{$\rC\final$}
+\UnaryInfC{$a@\rC\trnt[0]$}
+\DisplayProof
+%
+\,
+%
+\AxiomC{$\rC\trnt[i]$}
+\AxiomC{$\neg \rC\final$}
+\BinaryInfC{$a@\rC\trnt[i+1]$}
+\DisplayProof
+\end{center}
+%
+The rules for sequential composition and choice are noteworthy: they essentially ignore the transience of the second operant, respectively both operands. This is a simplification justified by the fact that reachable terms will always have steady operands at those positions. 
