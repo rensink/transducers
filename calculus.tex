@@ -1,46 +1,46 @@
 \section{A calculus for control}
 \label{sec:calculus}
 
-The nonterminal $\rC$ stands for arbitrary control programs, which will turn out to give rise to proper transducers (i.e., that do not have $\emptystr$ as concrete transition). The nonterminal $\rR$ generates the fragment of non-empty, finite programs. Finally, $\rF$ stands for a refinement function.
+In the following, the nonterminal $\rC$ stands for arbitrary control programs. The nonterminal $\rR$ generates the fragment of non-empty, finite programs. Finally, $\rF$ stands for a refinement function: $a_1$ up to $a_n$ should be thought of as abstract actions, which are mapped to $\rR$-terms over concrete actions.
 %
 \begin{align*}
-\rC & \ruleis a \rulemid \term \rulemid \rC_1;\rC_2 \rulemid \rC_1+\rC_2 \rulemid \rC_1\try \rC_2 \rulemid \alap \rC \rulemid \rC[\rF] \rulemid a@\rC \\
-\rR & \ruleis a \rulemid \rR_1;\rC_2 \rulemid \rR_1+\rR_2 \rulemid \rR_1\try \rR_2 \rulemid \rR[\rF] \\
+\rC & \ruleis a \rulemid \term \rulemid \rC_1;\rC_2 \rulemid \rC_1+\rC_2 \rulemid \rC_1\orelse \rC_2 \rulemid \alap \rC \color{gray} \rulemid \rC[\rF] \rulemid a@\rC \color{black} \\
+\rR & \ruleis a \rulemid \rR_1;\rC_2 \rulemid \rR_1+\rR_2 \rulemid \rR_1\orelse \rR_2 \rulemid \rR[\rF] \\
 \rF & \ruleis a_1 \mapsto \rR_1, \cdots, a_n\mapsto \rR_n \enspace.
 \end{align*}
 %
 Non-standard operators are:
 \begin{itemize}
-\item \emph{Priority choice} $\rC_1\try \rC_2$. Tries to execute $\rC_1$; if this fails, tries to execute $\rC_2$.
-\item \emph{As-long-as-possible} $\alap \rC$. Can be thought of as equivalent to $\rC;\alap \rC\try \term$.
-\item \emph{Refinement} $\rC[\rF]$. When $\rC$ invokes action $a$, $\rC[\rF]$ atomically executes $\rF(a)$.
+\item \emph{Priority choice} $\rC_1\orelse \rC_2$. Tries to execute $\rC_1$; if this fails, tries to execute $\rC_2$.
+\item \emph{As-long-as-possible} $\alap \rC$. Can be thought of as equivalent to $\rC;\alap \rC\orelse \term$.
+\item \emph{Refinement} $\rC[\rF]$. When $\rC$ invokes action $a$, $\rC[\rF]$ atomically invokes $\rF(a)$.
 \item \emph{Intermediate state $a@\rC$}. Reached during the atomic execution of a refined $a$.
 \end{itemize}
 %
-We will explain the purpose and functioning of control programs by first restricting to the fragment without refinement. For the semantics, we adapt the approach of \cite{CCS-Priority-Choice} to the setting of this paper. (See \Cref{sec:related} for a brief discussion of the adaptations.)
+We will explain the purpose and functioning of control programs by first restricting to the fragment without refinement; i.e., the black clauses of $\rC$. For the semantics, we adapt the approach of \cite{CCS-Priority-Choice} to the setting of this paper. (See \Cref{sec:related} for a brief discussion of the adaptations.)
 
-A control program $\rC$ is \emph{imposed} on an existing \emph{target system} $\cS$, the behaviour of which is given by a labelled transition system (LTS); the composed system is denoted $\rC\on\cS$. In the composed system, $\rC$ \emph{invokes} actions of the target system in a given order and $\cS$ \emph{executes} them; however, not all actions that $\rC$ tries to invoke are always enabled in the LTS, if not, the invocation attempt fails. These roles (invocation and execution) roughly correspond to \emph{output} (by the control program) versus \emph{input} (of the LTS), as used in CCS \cite{CCS}.
+A control program $\rC$ is \emph{imposed} on an existing \emph{target system} $\cS$, the behaviour of which is given by a labelled transition system (LTS); the composed system is denoted $\rC\on\cS$. In the composed system, $\rC$ \emph{invokes} actions of the target system in a given order and $\cS$ \emph{executes} them; however, not all actions that $\rC$ tries to invoke are always applicable (executable) in the LTS, and if not, the invocation fails. These roles (invocation and execution) roughly correspond to \emph{output} (by the control program) versus \emph{input} (of the LTS), as used in CCS \cite{CCS}.
 
-In a control program of the form $\rC_1\try \rC_2$, the operand $\rC_2$ is ``activated'' if and only if none of the actions initially invoked by $\rC_1$ are enabled in the target system; the control program $\alap \rC_1$ terminates in that case. Hence action invocation by, as well as termination of, a control program is in general \emph{conditional} on the failure of other, previously attempted actions. This effect is captured by the following predicates:
+In a control program of the form $\rC_1\orelse \rC_2$, the operand $\rC_2$ is ``activated'' if and only if none of the actions initially invoked by $\rC_1$ are executable in the target system. The control program $\alap \rC_1$ terminates in that case. Hence action invocation by, as well as termination of, a control program is in general \emph{conditional} on the failure of other, previously attempted actions. This effect is captured by the following predicates:
 %
 \begin{itemize}
-\item $\rC \invokes X$ for some set of actions $X$, denoting that the control program $\rC$ can only progress by invoking one of the actions in $X$ (and in particular, cannot immediately terminate);
-\item $\cS \enables X$ for some set of actions $X$, denoting that at least one of the actions in $X$ is enabled in the target system $\cS$;
-\item $\rC\trans{a\ifnot X} \rC'$ (read: ``$a$ unless $X$''), denoting that the control program $\rC$ invokes $a$, evolving into $\rC'$, \emph{unless} one of the (previously tried) actions in $X$ was enabled.
+\item $\rC \tries X$ for some set of actions $X$, denoting that the control program $\rC$ can only progress by invoking one of the actions in $X$ (and in particular, cannot immediately terminate);
+\item $\rC\trans{a\ifnot X} \rC'$ (read: ``$a$ unless $X$''), denoting that the control program $\rC$ invokes $a$, evolving into $\rC'$, \emph{unless} one of the actions in $X$ is executable. As we will see, this is only used in case $\rC\tries X$, so the actions occurring as negative conditions for the invocation of $a$ have actually themselves been tried.
+\item $\cS \cando X$ for some set of actions $X$, denoting that at least one of the actions in $X$ is executable in the target system $\cS$;
 \end{itemize}
 %
 Each of these predicates can be defined using SOS-type rules. Two crucial rules are:
 %
 \begin{center}
-\AxiomC{$\rC_1\invokes X$}
+\AxiomC{$\rC_1\tries X$}
 \AxiomC{$\rC_2\trans{a\ifnot Y} \rC'$}
-\BinaryInfC{$\rC_1\try \rC_2\displaytrans{a\ifnot(X\cup Y)} \rC'$}
+\BinaryInfC{$\rC_1\orelse \rC_2\displaytrans{a\ifnot(X\cup Y)} \rC'$}
 \DisplayProof
 %
 \quad
 %
 \AxiomC{$\rC\trans{a\ifnot X} \rC'$}
-\AxiomC{$\neg (\cS\enables X)$}
+\AxiomC{$\neg (\cS\cando X)$}
 \AxiomC{$\cS\trans a \cS'$}
 \TrinaryInfC{$\rC\on \cS \displaytrans a \rC'\on \cS'$}
 \DisplayProof
@@ -70,7 +70,7 @@ Terms and refinement functions are \emph{typed}: $\rC:A,C$ (respectively $\rF:A,
 \BinaryInfC{$\begin{array}[t]{c}
 \rC_1;\rC_2:A,C \\
 \rC_1+\rC_2:A,C \\
-\rC_1\try\rC_2:A,C \\
+\rC_1\orelse\rC_2:A,C \\
 \alap\rC_1:A,C
 \end{array}$}
 \DisplayProof
