@@ -1,7 +1,7 @@
 \section{Introduction}
 \label{sec:intro}
 
-A principle that has often be proposed as a basis for system specification is that of \emph{declarative rules} that specify the ways in which the system may evolve, without prescribing in details how the evolution steps should be implemented. Such a rule typically includes an condition for its application, restricting the states in which it can be applied to those that satisfy that condition, as well as a specification of the state change that occurs when it is applied. Thus, the extension (i.e., the semantics) of the application condition is the set of states that satisfy it, and that of the state change is a binary relation over states.
+A principle that has often be proposed as a basis for system specification is that of \emph{declarative rules}, which specify the ways in which the system may evolve without prescribing in details how the evolution steps should be implemented. Such a rule typically includes an condition for its application, restricting the states in which it can be applied to those that satisfy that condition, as well as a specification of the state change that occurs when it is applied. Thus, the extension (i.e., the semantics) of the application condition is the set of states that satisfy it, and that of the state change is a binary relation over states.
 
 In its pure form, the behaviour arising from such of a set of rules, given an initial state, is completely determined: it consists of all states that are reachable by the repeated application of rules, whenever they are applicable; the rule applications themselves can be captured by rule-labelled transitions. The resulting labelled transition system can then form the basis for further analysis, composition, or implementation.
 
