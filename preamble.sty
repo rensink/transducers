@@ -14,6 +14,7 @@
 \normalem
 \usepackage{comment}
 \usepackage{algorithm}
+\usepackage{centernot}
 \usepackage[noend]{algpseudocode}
 \algrenewcommand{\algorithmicfor}{{\bfseries\sffamily for}}
 \algrenewcommand{\algorithmicif}{{\bfseries\sffamily if}}
@@ -45,6 +46,7 @@
 \newcommand{\on}{\mathbin{{:}{:}}}
 \newcommand{\tries}{\mathrel{\mathit{tries}}}
 \newcommand{\cando}{\mathrel{\mathit{can}}}
+\newcommand{\ncando}{\centernot{\cando}}
 \newcommand{\ifnot}{{\hat{\;}}}
 \newcommand{\term}{\varepsilon}
 \newcommand{\close}[1]{\bar{#1}}
@@ -136,6 +138,11 @@
 % Such that
 \newcommand{\st}{.\,}
 
+\newenvironment{inumerate}{%
+  \begin{enumerate*}[label=\emph{(\roman*)}]
+}{%
+  \end{enumerate*}%
+}
 % Special arrows
 
 % Typeset the label of an extensible arrow by lowering the text
