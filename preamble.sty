@@ -4,6 +4,7 @@
 \usepackage{mathtools}
 %\usepackage{MnSymbol}
 \usepackage{stmaryrd}
+\usepackage{hyperref}
 \usepackage[inline]{enumitem}
 \setlist{itemsep=0pt}
 \usepackage{graphicx}
@@ -35,7 +36,7 @@
 \newcommand{\stdy}[1][]{{\bullet^{#1}}}
 \newcommand{\Final}{\mathsf{F}}
 \newcommand{\final}{{\uparrow}}
-\newcommand{\full}[1][]{{\color{grey}\circ^{#1}}}
+\newcommand{\present}[1][]{{\color{gray}\bullet^{#1}}}
 
 \newcommand{\qinit}{\iota}
 \newcommand{\Lab}{\Lambda}
@@ -125,6 +126,18 @@
 \newcommand{\cR}{\mathcal{R}}
 \newcommand{\cS}{\mathcal{S}}
 
+\newcommand{\LTS}{\mathbf{LTS}}
+\newcommand{\CA}{\mathbf{CA}}
+\newcommand{\SA}{\mathbf{SA}}
+
+\newcommand{\eone}{\mathsf{e}_1}
+\newcommand{\etwo}{\mathsf{e}_2}
+\newcommand{\emin}{\mathsf{s}}
+\newcommand{\beans}{\mathsf{b}}
+\newcommand{\refill}{\mathsf{r}}
+\newcommand{\money}{\mathsf{m}}
+\newcommand{\coffee}{\mathsf{c}}
+
 \newcommand{\natN}{\mathbb{N}}
 \newcommand{\boolB}{\mathbb{B}}
 
@@ -199,19 +212,19 @@
 \newcommand{\Tduce}[2]{\Trans{{#1}{\on}{#2}}}
 
 % single-arrow transition
-\newcommand{\trans}[2][\,]{\mathchoice
-  {\inlinetrans[#1]{#2}}
-  {\inlinetrans[#1]{#2}}
-  {\inlinetrans[#1]{#2}}
-  {\inlinetrans[#1]{#2}}
-}
-\newcommand{\inlinetrans}[2][\,]{\mathrel{
-  \smash{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
-  \vphantom{\xrightarrow{\lowerlabel{#2}}}
+\newcommand{\trans}[2][\,]{\mathrel{\mathchoice
+  {\inlinetrans[#1]{#2}}%
+  {\inlinetrans[#1]{#2}}%
+  {\inlinetrans[#1]{#2}}%
+  {\inlinetrans[#1]{#2}}%
 }}
-\newcommand{\displaytrans}[2][\,]{\mathrel{
-  \smash{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
-  \vphantom{\xrightarrow{X}}
+\newcommand{\inlinetrans}[2][\,]{\mathrel{%
+  \smash{\xrightarrow{\lowerlabel{#2}}_{\!#1}}%
+  \vphantom{\xrightarrow{\lowerlabel{#2}}}%
+}}
+\newcommand{\displaytrans}[2][\,]{\mathrel{%
+  \smash{\xrightarrow{\lowerlabel{#2}}_{\!#1}}%
+  \vphantom{\xrightarrow{X}}%
 }}
 % negative single-arrow transition
 \newcommand{\ntrans}[2][\,]{\mathrel{\xarrownot\trans{#2}}_{\!#1}}
