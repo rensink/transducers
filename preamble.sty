@@ -25,6 +25,10 @@
 \usepackage{multicol}
 \usepackage{bussproofs}
 \usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
 
 \newcommand{\dom}{\mathop{\mathrm{dom}}}
 \newcommand{\True}{\mathbf{true}}
@@ -121,6 +125,8 @@
 \newcommand{\rF}{\mathsf{F}}
 \newcommand{\rR}{\mathsf{R}}
 
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
 \newcommand{\cI}{\mathcal{I}}
 \newcommand{\cP}{\mathcal{P}}
 \newcommand{\cR}{\mathcal{R}}
@@ -157,6 +163,7 @@
   \end{enumerate*}%
 }
 % Special arrows
+\newcommand{\movesto}{\rightsquigarrow}
 
 % Typeset the label of an extensible arrow by lowering the text
 \newcommand{\lowerlabel}[1]{\smash{\mathchoice
