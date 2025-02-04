@@ -2,7 +2,8 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{mathtools}
-%\usepackage{MnSymbol}
+%\usepackage{fdsymbol}
+\usepackage{MnSymbol}
 \usepackage{stmaryrd}
 \usepackage{hyperref}
 \usepackage[inline]{enumitem}
@@ -33,13 +34,14 @@
 \newcommand{\dom}{\mathop{\mathrm{dom}}}
 \newcommand{\True}{\mathbf{true}}
 \newcommand{\False}{\mathbf{false}}
-
 \newcommand{\Trnt}{\mathsf{T}}
 \newcommand{\trnt}[1][]{{\circ^{#1}}}
 \newcommand{\Stdy}{\mathsf{S}}
 \newcommand{\stdy}[1][]{{\bullet^{#1}}}
 \newcommand{\Final}{\mathsf{F}}
+\newcommand{\internal}{{\odot}}
 \newcommand{\final}{{\uparrow}}
+\newcommand{\cfinal}{{\upmapsto}}
 \newcommand{\present}[1][]{{\color{gray}\bullet^{#1}}}
 
 \newcommand{\qinit}{\iota}
@@ -49,13 +51,17 @@
 \newcommand{\orelse}{\mathbin{?}}
 \newcommand{\alap}{\mathop{!}}
 \newcommand{\on}{\mathbin{{:}{:}}}
+\newcommand{\abs}{\mathbin{\Uparrow}}
 \newcommand{\tries}{\mathrel{\mathit{tries}}}
 \newcommand{\cando}{\mathrel{\mathit{can}}}
 \newcommand{\ncando}{\centernot{\cando}}
 \newcommand{\ifnot}{{\hat{\;}}}
 \newcommand{\term}{\varepsilon}
+\newcommand{\dead}{\delta}
 \newcommand{\close}[1]{\bar{#1}}
 \newcommand{\closex}[1]{\overline{#1}}
+
+\newcommand{\sys}[1]{\overline{#1}}
 
 \newcommand{\LTduce}{\mathbf{LT}}
 \newcommand{\STduce}{\mathbf{ST}}
@@ -65,65 +71,18 @@
 \newcommand{\ruleis}{\;::=\;}
 \newcommand{\rulemid}{\:\mid\:}
 
-% Inner and outer
-\newcommand{\kInner}{innr}
-\newcommand{\Inner}[1][\,]{\ensuremath{\mathit{\kInner}_{\!#1}}\xspace}
-\newcommand{\pInner}{\mbox{\textit{\uline{\kInner}}}\xspace}
-\newcommand{\kOuter}{outr}
-\newcommand{\Outer}[1][\,]{\ensuremath{\mathit{\kOuter}_{\!#1}}\xspace}
-\newcommand{\pOuter}{\mbox{\uline{$\mathit{\kOuter}$}}\xspace}
-
-\newcommand{\Init}[1][\,]{\ensuremath{\iota}_{\!#1}\xspace}
-\newcommand{\pInit}{\mbox{\uline{$\iota$}}\xspace}
-
-% Open and closed
-\newcommand{\Open}[1][\,]{\ensuremath{\mathit{open}}_{\!#1}\xspace}
-\newcommand{\Closed}[1][]{\ensuremath{\mathit{clsd}_{#1}}\xspace}
-\newcommand{\pClosed}{\mbox{\uline{\textit{clsd}}}\xspace}
-\newcommand{\pOpen}{\mbox{\uline{\textit{open}}}\xspace}
-
-% Absent and presend
-\newcommand{\kAbsent}{abst}
-\newcommand{\Absent}[1][]{\ensuremath{\mathit{\kAbsent}}_{#1}\xspace}
-\newcommand{\pAbsent}{\mbox{\uline{\textit{\kAbsent}}}\xspace}
-\newcommand{\kPresent}{prst}
-\newcommand{\Present}[1][\,]{\ensuremath{\mathit{\kPresent}}_{\!#1}\xspace}
-\newcommand{\pPresent}{\mbox{\uline{\textit{\kPresent}}}\xspace}
-
-% Steady and transient
-\newcommand{\kSteady}{stdy}
-\newcommand{\Steady}[1][\mkern1mu]{\ensuremath{\mathit{\kSteady}}_{\mkern-1mu#1}\xspace}
-\newcommand{\pSteady}{\mbox{\textit{\uline{\kSteady}}}\xspace}
-\newcommand{\kTransient}{trnt}
-\newcommand{\Transient}[1][\,]{\ensuremath{\mathit{\kTransient}}_{\!#1}\xspace}
-\newcommand{\pTransient}{\mbox{\textit{\uline{\kTransient}}}\xspace}
-
-% Fertile and barren
-\newcommand{\kFertile}{frtl}
-\newcommand{\pFertile}{\mbox{\textit{\uline{\kFertile}}}\xspace}
-\newcommand{\kBarren}{brrn}
-\newcommand{\pBarren}{\mbox{\textit{\uline{\kBarren}}}\xspace}
-
-% Transience level
-\newcommand{\TLevel}[1][]{\ensuremath{\tau}_{#1}\xspace}
-\newcommand{\pTLevel}{\mbox{\uline{$\tau$}}\xspace}
-
-% Absence level
-\newcommand{\ALevel}[1][]{\ensuremath{\alpha}_{#1}\xspace}
-\newcommand{\pALevel}{\mbox{\uline{$\alpha$}}\xspace}
-
-% Outer level
-\newcommand{\OLevel}[1][\,]{\ensuremath{o}_{\!#1}\xspace}
-% Recipe mapping
-\newcommand{\Recipe}[1][\,]{\ensuremath{\rho}_{\!#1}\xspace}
-
-% Partiality of a transition
-\newcommand{\Partial}[1][]{\ensuremath{\mathit{part}}_{\!#1}\xspace}
-\newcommand{\Atomic}[1][]{\ensuremath{\mathit{atom}}_{\!#1}\xspace}
-
 \newcommand{\rC}{\mathsf{C}}
 \newcommand{\rF}{\mathsf{F}}
 \newcommand{\rR}{\mathsf{R}}
+\newcommand{\rS}{\mathsf{S}}
+
+%\newcommand{\a}{\mathsf{a}}
+%\newcommand{\c}{\mathsf{c}}
+
+\newcommand{\x}{\mathsf{x}}
+\newcommand{\y}{\mathsf{y}}
+\newcommand{\z}{\mathsf{z}}
+\newcommand{\dont}{}
 
 \newcommand{\cC}{\mathcal{C}}
 \newcommand{\cD}{\mathcal{D}}
@@ -131,6 +90,10 @@
 \newcommand{\cP}{\mathcal{P}}
 \newcommand{\cR}{\mathcal{R}}
 \newcommand{\cS}{\mathcal{S}}
+\newcommand{\cU}{\mathcal{U}}
+
+\newcommand{\toS}[1]{\rS(#1)}
+\newcommand{\toC}[1]{\rC(#1)}
 
 \newcommand{\LTS}{\mathbf{LTS}}
 \newcommand{\CA}{\mathbf{CA}}
@@ -152,6 +115,7 @@
 \newcommand{\tupof}[1]{\langle{#1}\rangle}
 \newcommand{\powersetof}[1]{\cP({#1})}
 \newcommand{\iffdef}{:\Leftrightarrow}
+\newcommand{\isdef}{:=}
 % Partial function
 \newcommand{\pto}{\hookrightarrow}
 % Such that
@@ -162,8 +126,12 @@
 }{%
   \end{enumerate*}%
 }
+
+\newcommand{\bis}{\mathrel{\rho}}
+
 % Special arrows
 \newcommand{\movesto}{\rightsquigarrow}
+\newcommand{\nmovesto}{\nrightsquigarrow}
 
 % Typeset the label of an extensible arrow by lowering the text
 \newcommand{\lowerlabel}[1]{\smash{\mathchoice
@@ -205,18 +173,21 @@
 \newcommand{\xarrownot}{\mathrel{\arrownot-}\mkern-7mu}
 
 % single-arrow transduction
+\newcommand{\tducex}{\mapstochar\trans{}}
+\newcommand{\ntducex}{\not\tducex{}}
 %\newcommand{\tduce}[3][\,]{\mathrel{
 %  \smash{\xrightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
 %  \vphantom{\xrightarrow{\lowerlabel{#2}}_{\!#1}}
 %}}
-\newcommand{\tduce}[3][\,]{\trans[#1]{{#2}{\on}{#3}}}
+\newcommand{\tduce}[3][\,]{\mapstochar\trans[#1]{{#2}{:}{#3}}}
+\newcommand{\ntduce}[3][\,]{\not\tduce[#1]{#2}{#3}}
 
 % double-arrow transduction
-%\newcommand{\Tduce}[3][\,]{\mathrel{
-%  \smash{\xRightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
-%  \vphantom{\xrightarrow{\lowerlabel{#2}}}
-%}}
-\newcommand{\Tduce}[2]{\Trans{{#1}{\on}{#2}}}
+\newcommand{\Tduce}[3][\,]{\mathrel{
+  \smash{\xRightarrow[\raiselabelxx{#3}]{\lowerlabel{#2}}_{\!#1}}
+  \vphantom{\xrightarrow{\lowerlabel{#2}}}
+}}
+%\newcommand{\Tduce}[2]{\Trans{{#1}{\on}{#2}}}
 
 % single-arrow transition
 \newcommand{\trans}[2][\,]{\mathrel{\mathchoice
@@ -234,7 +205,10 @@
   \vphantom{\xrightarrow{X}}%
 }}
 % negative single-arrow transition
-\newcommand{\ntrans}[2][\,]{\mathrel{\xarrownot\trans{#2}}_{\!#1}}
+\newcommand{\ntrans}[2][\,]{\mathrel{\not\trans{#2}}_{\!#1}}
+
+% Reachability up to transient depth
+\newcommand{\Reach}[1]{\Rightarrow_{\smash{#1}\vphantom{b}}}
 
 % doublie-arrow transition
 \newcommand{\Trans}[2][\,]{\mathchoice

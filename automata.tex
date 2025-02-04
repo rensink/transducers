@@ -1,31 +1,118 @@
 \section{Control automata}
 \label{sec:automata}
 
-We presuppose a universe $\Lab$ of \emph{labels}. For subsets $A\subseteq \Lambda$, we use $A^\emptystr$ to denote $A\cup\setof\emptystr$, where $\emptystr\notin\Lambda$ is a special symbol signifying the empty string.
+We presuppose a universe $\Lab$ of \emph{labels}. To formally define control automata including action declaration, we have to recognise that it mediates between an \emph{abstract} and \emph{concrete} (or \emph{outside} and \emph{inside}) alphabet: if $\cC$ is such an automaton controlling $\cS$, then the concrete (inside) actions are the ones of $\cS$, whereas the abstract (outside) actions are the ones of $\cC\on \cS$. This leads us to define control automata as \emph{transducers} rather than transition systems.
 
-\begin{definition}[transducer]
-Let $A,C\subseteq \Lambda$ be sets of actions. An \emph{$A$ to $C$-transducer} is a tuple $\cS=\tupof{Q,\qinit,Q^\Stdy,Q^\Final,T}$ where
+\begin{definition}[control automaton]\label{def:control}
+Let $X,Y\subseteq \Lambda$ be sets of actions. An \emph{$X$ to $Y$-control automaton} is a tuple $\cC=\tupof{C,L,{\trans{}},{\movesto},{\final},\tau,\qinit}$ where
 \begin{itemize}[topsep=\itemsep]
-\item $Q$ is a set of states;
-\item $\qinit\in Q^\Stdy$ is the initial state;
-\item $T\subseteq Q\times A\times C^*\times Q$ is a transition relation, such that $(q,a,\sigma,q'),(q',b,\rho,q'')\in T$ with $q'\notin Q^\Stdy$ implies $a=b$.
-\item $Q^\Final\subseteq Q^\Stdy$ is the subset of \emph{final} states;
-\item $\tau:Q\to \natN$ is a \emph{transience level}, such that $(q,a,\sigma,q'),(q',b,\rho,q'')\in T$ with $\tau(q')>0$ implies $a=b$.
-\end{itemize}
-A transducer $\cS$ is called
-\begin{itemize}
-\item \emph{large-step} if $\tau(q)=0$ for all $q\in Q$,
-\item \emph{small-step} if $(q,a,\sigma,q')\in T$ implies $\sigma\in C^\emptystr$,
-\item \emph{pure} if $(q,a,\sigma,q')\in T$ implies $\sigma\in C$, and 
-\item a \emph{transition system} if $C=\emptyset$ (hence $(q,a,\sigma,q')\in T$ implies $\sigma=\emptystr$).
-\item \emph{empty} if $\qinit \in Q^\Final$.
-\item \emph{unambiguously terminating} if $(q,a,\sigma,q')$ implies $q\notin Q^\Final$.
-\end{itemize}
-Two transducers $\cS_1,\cS_2$ are \emph{isomorphic}, denoted $\cS_1\equiv \cS_2$, if there is a bijective mapping $f:Q_1\to Q_2$ such that $f(\qinit_2)=\qinit_2$, $f(Q^\Final_1)=Q^\Final_2$, $f(T_1)=T_2$ (where in the last two equations, $f$ is tacitly extended pointwise), and $\tau_1=\tau_2\circ f$.
+\item $C$ is a set of states;
+\item ${\tducex}\subseteq C\times X\times Y\times Q$ is a transduction relation;
+\item ${\movesto}\subseteq C\times C$ is an \emph{or-else} relation;
+\item ${\cfinal}\subseteq C$ is a termination predicate, such that $c\cfinal$ implies $c\ntducex$ and $q\nmovesto$;
+\item $\tau:C\to \natN$ is a \emph{transience level}, such that $c\cfinal$ implies $\tau(c)=0$, $c\movesto c'$ implies $\tau(c')\leq \tau(c)$, and if  $\tau(c)>0$ then $(c',\x,\y,c),(c,\x',\y',c'')\in{\tducex}$ implies $\x=\x'$;
+%\item ${\internal}\subseteq C$ is a set of \emph{internal states}, such that $q\internal$ implies 
+%\begin{inumerate}
+%\item $\tau(q)>0$ and 
+%\item $q'\tduce{\x}{\dont} q\tduce{\x'}{\dont} q''$ only if $a=a'$;
+%\end{inumerate}
+\item $\qinit\in Q$ is the initial state, with $\tau(\qinit)=0$.
+\end{itemize} 
 \end{definition}
 %
-The class of large-step $A$-to-$C$-transducers is denoted $\LTduce(A,C)$, that of small-step $A$-to-$C$ transducers $\STduce(A,C)$. We will also use $\STduce(\any,C)$ to denote the union of $\STduce(A,C)$ for arbitrary $A\subseteq\Lab$.
+The set of $X$-to-$Y$ control automata is denoted $\CA_{X,Y}$. If $\tau(c)=0$, we call $c$ \emph{steady}, otherwise \emph{transient}. The additional structure with respect to an LTS can be understood as follows:
+%
+\begin{itemize}
+\item A transduction $c\tduce\x\y c'$ invokes action $\y\in Y$ on the system while presenting it as $\x\in X$ to the outside.
+\item The \emph{or-else} relation $\movesto$ has the meaning introduced in the motivation above: $c\movesto c'$ describes how control evolves if no action from $c$ is applicable.
+\item The \emph{transience level} $\tau(c)$ is the depth of the atomic block nesting of $c$. Since atomic blocks are always associated with declared actions, a transient control state can only occur as internal state of the execution of such a declared action; hence every incoming and outgoing transduction will have that (abstract) action as its outer label.
+%\item The \emph{internal} predicate $\internal$ holds for states that are in 
+\end{itemize}
+%
+Though control automata and system automata are conceptually different, on a technical level it is useful to establish mappings back and forth. Any LTS $\cS\in \cS_X$ can be understood as an $X$-to-$\setof\bullet$ control automaton $\toC\cS\in \CA_{X,\setof\bullet}$ (where $\bullet$ is a fixed ``internal'' action) defined by
+%
+\[ \toC\cS \:\isdef\: \tupof{Q,\gensetof{q\tduce\x\bullet q'}{q\trans\x q'}, \emptyset, {\final}, \gensetof{(q,0)}{q\in Q},\qinit}
+\]
+%
+Vice versa, a control automaton $\cC\in \CA_{X,Y}$ can be understood as a system automaton $\toS\cC$, intuitively by imagining that it is imposed on some ``universal'' one-state system automaton $\cU_Y$ with transitions $\qinit \trans\y \qinit$ for al $\y\in Y$ and $\qinit\final$. Since $\cU_Y$ does not constrain the execution of actions that $\cC$ enables, the resulting system automaton has atomic, abstract transitions for every terminating concrete transition sequence between steady states of $\cC$; and the or-else relation of $\cC$ is resolved accordingly. Formally:
+%
+\[ \toS\cC \:\isdef\: \tupof{\gensetof{c\in C}{\tau(c)=0},{\trans{}},{\final},\qinit} \]
+%
+To define $\trans{}$ and $\final$, we need an auxiliary family of \emph{reachability relations} $\setof{\Reach n}_{n\in \natN}$ with ${\Reach n}\subseteq C\times C$ for all $n\in \natN$, inductively defined by the following rules:
+%
+\begin{center}
+\def\defaultHypSeparation{\hskip1mm}
+\AxiomC{$n\geq \tau(c)\vphantom{\Reach{()}}$}
+\UnaryInfC{$c\Reach n c\vphantom{c''}$}
+\DisplayProof
+%
+\enspace
+%
+\AxiomC{$c\tducex c'\vphantom{\Reach{()}}$}
+\AxiomC{$c'\Reach{\tau(c)} c''$}
+%\AxiomC{$n < \tau(c)$}
+\BinaryInfC{$c\Reach{\tau(c)} c''$}
+\DisplayProof
+%
+\enspace
+%
+\AxiomC{$\neg (c\tducex \Reach{\tau(c)})$}
+\AxiomC{$c\movesto c'$}
+\AxiomC{$c'\Reach n c''$}
+\TrinaryInfC{$c\Reach n c''$}
+\DisplayProof
+\end{center}
+%
+The resulting relation has the following, technical, property:
+%
+\begin{lemma}
+Let $\cC$ be a control automaton. $c\Reach n c'$ if and only if is a (possibly empty) \emph{$n$-transient path} $c_0\cdots c_m$ from $c=c_0$ to $c'=c_m$, where a sequence of control states $c_0\cdots c_m$ with $m\geq 0$ is (inductively) defined to be an $n$-transient path if 
+\begin{enumerate}[topsep=\itemsep]
+\item For all $0\leq i<n$, either $c_i\tducex c_{i+1}$ or $c_i\movesto c_{i+1}$;
+\item $\tau(c_m)\leq n$, and $\tau(c_i)>n$ for all $0\leq i<m$ (i.e., $c_m$ is the first state in the sequence with transience not exceeding $n$);
+\item For $0\leq i<n$, if $c_i\movesto c_{i+1}$ then there is no $c_i\tducex c''$ such that $c''$ has an outgoing $\tau(c_i)$-transient path.
+\end{enumerate}
+\end{lemma}
+%
+Using reachability, we can now define $\trans{}$ and $\final$, being the transition relation and termination predicate of $\toS\cC$. The rules below are only considered for steady $c\in C$.
+%
+\begin{center}
+%\def\defaultHypSeparation{\hskip1mm}
+\AxiomC{$c\tduce\x\y c'$}
+\AxiomC{$c'\Reach{0} c''$}
+\BinaryInfC{$c\trans\x c''$}
+\DisplayProof
+%
+\qquad
+%
+\AxiomC{$\neg (c\tducex \Reach{0})$}
+\AxiomC{$c\movesto c'$}
+\AxiomC{$c'\trans\x c''$}
+\TrinaryInfC{$c\trans\x c''$}
+\DisplayProof
+%
+\\[\medskipamount]
+%
+\AxiomC{$c\cfinal\vphantom{\Reach{()}}$}
+\UnaryInfC{$c\final$}
+\DisplayProof
+%
+\qquad
+%
+\AxiomC{$\neg (c\tducex \Reach{0})$}
+\AxiomC{$c\movesto c'$}
+\AxiomC{$c'\final$}
+\TrinaryInfC{$c\final$}
+\DisplayProof
+\end{center}
+%
+The following is immediate and shows that $\trans{}$ and $\final$ are indeed defined over the states of $\toS\cC$, to wit the steady states of $\cC$.
+%
+\begin{lemma}
+Let $\cC$ be a control automaton. For $c,c'\in C$, if $c\trans\x c'$ or $c'\final$, then $\tau(c')=0$.
+\end{lemma}
 
+\begin{comment}
 A state with transience level $0$ is called \emph{steady} and with positive transience level \emph{transient}. We write $q\trnt[i]$ to denote $\tau(q)=i$ ($q$ has transience $i$), $q\stdy$ to denote $\tau(q)=0$ ($q$ is steady) and $q\stdy$ to denote $\tau(q)>0$ ($q$ is transient). If $\cS$ is large-step then we use $q\Tduce a\sigma q'$ to denote $(q,a,\sigma,q')\in T$, whereas if $\cS$ is small-step we use $q\tduce a\sigma q'$; in both cases, if $\sigma=\emptystr$ we may leave it out altogether. Finally, we write $q\final$ to denote $q\in Q^\Final$.
 
 An $A$-to-$C$ transducer $\cS$ establishes a relation between abstract actions (in $A$) and (sequences of) concrete actions (in $C$). The general intuition behind a transition $(q,a,\sigma,q')$ with $q,q'\stdy$ is that this causes a sequence of actions $\sigma$ to occur, while posing to the environment that $a$ has occurred. If either $q\trnt$ or $q'\trnt$, however, then $\sigma$ is only \emph{part} of the execution of $a$; the entire sequence of concrete actions that constitutes $a$ can be found by concatenating sequences of transitions starting and ending at steady states. Importantly, action execution is considered to be \emph{atomic}, meaning that if there is no reachable steady state, the abstract action does not occur at all.
@@ -63,36 +150,82 @@ The effect of transducers is essentially established by their \emph{composition}
 \end{center}
 %
 For small-step transducers, composition is similar, but includes a rule for the transience level:
+\end{comment}
 %
+Due to the mappings $\rS$ and $\rC$, when introducing new concepts we can start out by defining them for control automata; their meaning for system automata follows. For instance, we will prove our results modulo bisimilarity, which is a relation over control automata defined as follows.
+
+\begin{definition}[bisimilarity]\label{def:bisimilarity}
+Let $\cC_1,\cC_2\in \CA_{X,Y}$ be control automata. $\cC_1$ and $\cC_2$ are \emph{bisimilar}, denoted $\cC_1\sim \cC_2$, if there exists a binary relation ${\bis}\subseteq C_1\times C_2$ such that $\qinit_1\bis\qinit_2$, and if $c_1\bis c_2$ then
+\begin{itemize}
+\item $c_1\tduce \x\y c_1'$ [$c_2\tduce \x\y c_2'$] implies $\exists c_2'\st c_2\tduce \x\y c_2'$ [$\exists c_1'\st c_1\tduce \x\y c_1'$] such that $c_1'\bis c_2'$;
+\item $c_1\movesto c_1'$ [$c_1\movesto c_1'$] implies $\exists c_2'\st c_2\movesto c_2'$ [$\exists c_1'\st c_2\movesto c_1'$] such that $c_1'\bis c_2'$;
+\item $\tau_1(c_1)=\tau_2(c_2)$;
+\item $c_1\cfinal_1$ if and only if $c_1\cfinal_2$.
+\end{itemize}
+\end{definition}
+%
+For system automata $\cS_1,\cS_2\in \SA_{X}$, we define $\cS_1\sim \cS_2$ iff $\toC{\cS_1}=\toC{\cS_2}$. (Note that this comes down to the standard notion over LTSs.) The following states that $\rC$ and $\rS$ are well-defined modulo bisimilarity, and that $\rS$ is left inverse to $\rC$. The proof is straightforward and omitted here.
+
+\begin{proposition}
+Let $\cS_1,\cS_2\in \SA_X$ and $\cC_1,\cC_2\in \CA_{X,Y}$ such that $\cS_1\sim \cS_2$ and $\cC_1\sim \cC_2$. 
+\begin{align*}
+\toC{\cS_1} & \sim \toC{\cS_2} \\
+\toS{\cC_1} & \sim \toS{\cC_2} \\
+\toS{\toC{\cS_1}} & \sim \cS_1 \enspace.
+\end{align*}
+\end{proposition}
+
+\paragraph{Imposition.}
+
+Introduced in \Cref{sec:motivation}, $\cC\on\cS$ is the prime construction of this paper, in which the control automaton $\cC$ restricts the behaviour of the system automaton $\cS$, resulting in another system automaton. True to the principle formulated above, though, we define this as an operation on control automata, $\cC_1\on \cC_2$, from which the imposition on system automata is derived.
+
+For $\cC_1\in \CA_{X,Y}$ and $\cC_2\in \CA_{Y,Z}$, $\cC=\cC_1\on \cC_2\in \CA_{X,Z}$ is given by state set $C=\gensetof{c_1\on c_2}{c_1\in C_1, c_2\in C_2}$, initial state $\qinit=\qinit_1\on \qinit_2$, transience function $\tau:c_1\on c_2 \mapsto \tau(c_1)+\tau(c_2)$, and transduction, or-else and termination defined by the following rules:
+
 \begin{center}
 \insertBetweenHyps{\hskip 3pt}
-\AxiomC{$q_1\tduce a c q_1'$}
-\AxiomC{$q_2\tduce c \gamma q_2'$}
-\BinaryInfC{$q_1\on q_2 \tduce a \gamma q_1'\on q_2'$}
+\AxiomC{$c_1\tduce\x\y c_1'$}
+\AxiomC{$c_2\tduce\y\z c_2'$}
+\BinaryInfC{$c_1\on c_2 \tduce\x\z c_1'\on c_2'$}
 \DisplayProof
 %
 \,
 %
-\AxiomC{$q_1\tduce a \emptystr q_1'$}
-\UnaryInfC{$q_1\on q_2 \tduce a \emptystr q_1'\on q_2$}
+\AxiomC{$c_1\movesto c_1'$}
+\UnaryInfC{$c_1\on c_2 \movesto c_1'\on c_2$}
+\DisplayProof
+%
+\,
+%
+\AxiomC{$c_2\movesto c_2'$}
+\UnaryInfC{$c_1\on c_2 \movesto c_1\on c_2'$}
 \DisplayProof
 %
 \,
 %
 \insertBetweenHyps{\hskip 3pt}
-\AxiomC{$q_1\final$}
-\AxiomC{$q_2\final$}
-\BinaryInfC{$q_1\on q_2\;\final$}
-\DisplayProof
-%
-\,
-%
-\insertBetweenHyps{\hskip 3pt}
-\AxiomC{$q_1\trnt[i]$}
-\AxiomC{$q_2\trnt[j]$}
-\BinaryInfC{$q_1\on q_2\;\trnt[i+j]$}
+\AxiomC{$c_1\cfinal$}
+\AxiomC{$c_2\cfinal$}
+\BinaryInfC{$c_1\on c_2\;\cfinal$}
 \DisplayProof
 \end{center}
+%
+It is straightforward to show that this is well-defined modulo bisimilarity (if $\cC_1\sim \cC_1'$ and $\cC_2\sim \cC_2'$ then $\cC_1\on \cC_2\sim \cC_1'\on \cC_2'$). Furthermore, for arbitrary $X$, if $\cI_X\in \CA_{X,X}$ is the \emph{identity control automaton}, with singleton state set $C=\setof\qinit$, $\qinit\cfinal$, ${\movesto}=\emptyset$ and transductions $\qinit\tduce \x\x \qinit$ for all $\x\in X$, then the following equivalences hold for arbitrary $\cC_1\in\CA_{W,X}$, $\cC_2\in \CA_{X,Y}$ and $\cC_3\in \CA_{Y,Z}$.
+%
+\begin{align*}
+\cI_{W}\on \cC_1 & \sim \cC_1 \\
+\cC_1\on \cI_X & \sim \cC_1 \\
+\cC_1\on(\cC_2\on \cC_3) & \sim (\cC_1\on \cC_2)\on \cC_3 \enspace.
+\end{align*}
+%
+Imposition on system automata, is then given (for $\cC\in \CA_{X,Y}$ and $\cS\in \SA_Y$) by:
+%
+\[ \cC\on \cS \:\isdef\: \toS{\cC\on \toC\cS} \]
+%
+Much less trivially, but quite importantly for the consistency of our setup, is the following result stating that the conversion to a system automaton commutes with imposition.
+
+\begin{proposition}
+Let $\cC_1\in \CA_{X,Y}$ and $\cC_2\in \CA_{Y,Z}$; then $\cC_1\on \toS{\cC_2} \sim \toS{\cC_1\on \cC_2}$.
+\end{proposition}
 %
 For any set of actions $A\subseteq \Lambda$, the \emph{identity transducer} $\cI_A$ is a trivial, one-state $A$-to-$A$ transducer, where the one state (say $q$) is both initial and final, and there are transitions from $q$ to $q$ for all $a\in A$ that merely convert $a$ into itself. Formally, this is given by $\cI_A=\tupof{\setof q,q,T,\setof q,\setof{(q,0)}}$ for some arbitrary $q$, where $T$ is generated by
 %
