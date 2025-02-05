@@ -10,7 +10,13 @@ Let $X,Y\subseteq \Lambda$ be sets of actions. An \emph{$X$ to $Y$-control autom
 \item ${\tducex}\subseteq C\times X\times Y\times Q$ is a transduction relation;
 \item ${\movesto}\subseteq C\times C$ is an \emph{or-else} relation;
 \item ${\cfinal}\subseteq C$ is a termination predicate, such that $c\cfinal$ implies $c\ntducex$ and $q\nmovesto$;
-\item $\tau:C\to \natN$ is a \emph{transience level}, such that $c\cfinal$ implies $\tau(c)=0$, $c\movesto c'$ implies $\tau(c')\leq \tau(c)$, and if  $\tau(c)>0$ then $(c',\x,\y,c),(c,\x',\y',c'')\in{\tducex}$ implies $\x=\x'$;
+\item $\tau:C\to \natN$ is a \emph{transience level}, such that 
+\begin{itemize}
+\item $c\tducex c'$ implies $\tau(c')\geq \tau(c)$;
+\item $c\movesto c'$ implies $\tau(c')\leq \tau(c)$;
+\item if  $\tau(c)>0$ then $(c',\x,\y,c),(c,\x',\y',c'')\in{\tducex}$ implies $\x=\x'$, and
+\item $c\cfinal$ implies $\tau(c)=0$;
+\end{itemize}
 %\item ${\internal}\subseteq C$ is a set of \emph{internal states}, such that $q\internal$ implies 
 %\begin{inumerate}
 %\item $\tau(q)>0$ and 
@@ -23,8 +29,8 @@ Let $X,Y\subseteq \Lambda$ be sets of actions. An \emph{$X$ to $Y$-control autom
 The set of $X$-to-$Y$ control automata is denoted $\CA_{X,Y}$. If $\tau(c)=0$, we call $c$ \emph{steady}, otherwise \emph{transient}. The additional structure with respect to an LTS can be understood as follows:
 %
 \begin{itemize}
-\item A transduction $c\tduce\x\y c'$ invokes action $\y\in Y$ on the system while presenting it as $\x\in X$ to the outside.
-\item The \emph{or-else} relation $\movesto$ has the meaning introduced in the motivation above: $c\movesto c'$ describes how control evolves if no action from $c$ is applicable.
+\item A transduction $c\tduce\x\y c'$ invokes action $\y\in Y$ on the system while presenting it as $\x\in X$ to the environment. A transduction may enter, but not exit, an atomic block.
+\item The \emph{or-else} relation $\movesto$ has the meaning introduced in the motivation above: $c\movesto c'$ describes how control evolves if no action from $c$ is applicable. Or-else may exit, but not enter, an atomic block.
 \item The \emph{transience level} $\tau(c)$ is the depth of the atomic block nesting of $c$. Since atomic blocks are always associated with declared actions, a transient control state can only occur as internal state of the execution of such a declared action; hence every incoming and outgoing transduction will have that (abstract) action as its outer label.
 %\item The \emph{internal} predicate $\internal$ holds for states that are in 
 \end{itemize}
